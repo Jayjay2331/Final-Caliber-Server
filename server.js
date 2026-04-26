@@ -1,6 +1,11 @@
-const WebSocket = require("ws");
+const http = require('http');
+const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
+// Create HTTP server
+const server = http.createServer();
+
+// Create WebSocket server attached to HTTP server
+const wss = new WebSocket.Server({ server });
 
 let clients = new Set();
 let players = new Map();
@@ -26,17 +31,14 @@ wss.on("connection", (ws) => {
     ws.on("message", (raw) => {
         let text = raw.toString();
 
-        // --- COMMAND SYSTEM ---
         if (text.startsWith("/")) {
             const args = text.slice(1).split(" ");
             const cmd = args[0];
 
-            // /ping
             if (cmd === "ping") {
                 ws.send(JSON.stringify({ type: "system", msg: "pong" }));
             }
 
-            // /players
             if (cmd === "players") {
                 ws.send(JSON.stringify({
                     type: "system",
@@ -44,7 +46,6 @@ wss.on("connection", (ws) => {
                 }));
             }
 
-            // /tp x y z
             if (cmd === "tp") {
                 let x = parseFloat(args[1]);
                 let y = parseFloat(args[2]);
@@ -61,7 +62,6 @@ wss.on("connection", (ws) => {
             return;
         }
 
-        // --- NORMAL GAME DATA ---
         try {
             const data = JSON.parse(text);
             players.set(ws.id, data);
@@ -86,4 +86,8 @@ wss.on("connection", (ws) => {
     });
 });
 
-console.log("Server running");
+// Listen on both HTTP and WebSocket via same port
+const port = process.env.PORT || 8080;
+server.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on port ${port}`);
+});Copied!   
