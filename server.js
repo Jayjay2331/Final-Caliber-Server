@@ -4,7 +4,15 @@ const WebSocket = require('ws');
 // Create HTTP server
 const server = http.createServer();
 
-// Create WebSocket server attached to HTTP server
+// Health check endpoint
+server.on('request', (req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('OK');
+  }
+});
+
+// WebSocket server
 const wss = new WebSocket.Server({ server });
 
 let clients = new Set();
@@ -86,8 +94,8 @@ wss.on("connection", (ws) => {
     });
 });
 
-// Listen on both HTTP and WebSocket via same port
-const port = process.env.PORT || 8080;
-server.listen(port, "0.0.0.0", () => {
-    console.log(`Server running on port ${port}`);
-});Copied!   
+// Listen on 0.0.0.0 and use process.env.PORT
+const port = process.env.PORT || 10000;
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});
