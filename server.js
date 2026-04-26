@@ -3,13 +3,10 @@ const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: process.env.PORT || 8080 });
 
 let clients = new Set();
-
-// simple in-memory “game state”
 let players = new Map();
 
 function broadcast(obj) {
     const msg = JSON.stringify(obj);
-
     for (let client of clients) {
         if (client.readyState === WebSocket.OPEN) {
             client.send(msg);
@@ -22,8 +19,9 @@ wss.on("connection", (ws) => {
     clients.add(ws);
 
     ws.id = Math.random().toString(36).substr(2, 9);
-
     players.set(ws.id, { x: 0, y: 0, z: 0 });
+
+    ws.send(JSON.stringify({ type: "system", msg: "Connected to server" }));
 
     ws.on("message", (raw) => {
         let text = raw.toString();
@@ -66,7 +64,6 @@ wss.on("connection", (ws) => {
         // --- NORMAL GAME DATA ---
         try {
             const data = JSON.parse(text);
-
             players.set(ws.id, data);
 
             broadcast({
