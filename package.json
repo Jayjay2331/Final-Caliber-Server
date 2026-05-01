@@ -1,0 +1,21 @@
+{
+  "name": "multiplayer-game",
+  "version": "1.0.0",
+  "description": "Simple multiplayer game server using Express (no Socket.IO)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "game",
+    "multiplayer",
+    "node",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.20.0"
+  }
+}
